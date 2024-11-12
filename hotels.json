@@ -1,0 +1,165 @@
+{
+    "hotels": [
+        {
+            "hotel_id": "HOTEL001",
+            "hotel_name": "Hotel Dallas 1",
+            "city": "Dallas",
+            "available_rooms": 21,
+            "date_available": "2024-09-18",
+            "price_per_night": 297.4
+        },
+        {
+            "hotel_id": "HOTEL002",
+            "hotel_name": "Hotel San Francisco 2",
+            "city": "San Francisco",
+            "available_rooms": 33,
+            "date_available": "2024-09-02",
+            "price_per_night": 266.96
+            
+        },
+        {
+            "hotel_id": "HOTEL003",
+            "hotel_name": "Hotel Frisco 3",
+            "city": "Frisco",
+            "available_rooms": 4,
+            "date_available": "2024-09-14",
+            "price_per_night": 184.47
+        },
+        {
+            "hotel_id": "HOTEL004",
+            "hotel_name": "Hotel Austin 4",
+            "city": "Austin",
+            "available_rooms": 6,
+            "date_available": "2024-11-25",
+            "price_per_night": 263.1
+        },
+        {
+            "hotel_id": "HOTEL005",
+            "hotel_name": "Hotel Long Beach 5",
+            "city": "Long Beach",
+            "available_rooms": 11,
+            "date_available": "2024-11-09",
+            "price_per_night": 273.03
+        },
+        {
+            "hotel_id": "HOTEL006",
+            "hotel_name": "Hotel Bakersfield 6",
+            "city": "Bakersfield",
+            "available_rooms": 50,
+            "date_available": "2024-09-18",
+            "price_per_night": 294.33
+        },
+        {
+            "hotel_id": "HOTEL007",
+            "hotel_name": "Hotel Laredo 7",
+            "city": "Laredo",
+            "available_rooms": 18,
+            "date_available": "2024-10-02",
+            "price_per_night": 82.78
+        },
+        {
+            "hotel_id": "HOTEL008",
+            "hotel_name": "Hotel Brownsville 8",
+            "city": "Brownsville",
+            "available_rooms": 7,
+            "date_available": "2024-11-04",
+            "price_per_night": 253.75
+        },
+        {
+            "hotel_id": "HOTEL009",
+            "hotel_name": "Hotel Houston 9",
+            "city": "Houston",
+            "available_rooms": 21,
+            "date_available": "2024-11-20",
+            "price_per_night": 228.16
+        },
+        {
+            "hotel_id": "HOTEL010",
+            "hotel_name": "Hotel Corpus Christi 10",
+            "city": "Corpus Christi",
+            "available_rooms": 11,
+            "date_available": "2024-10-25",
+            "price_per_night": 167.16
+        },
+        {
+            "hotel_id": "HOTEL011",
+            "hotel_name": "Hotel Pasadena 11",
+            "city": "Pasadena",
+            "available_rooms": 20,
+            "date_available": "2024-09-17",
+            "price_per_night": 204.18
+        },
+        {
+            "hotel_id": "HOTEL012",
+            "hotel_name": "Hotel San Bernardino 12",
+            "city": "San Bernardino",
+            "available_rooms": 44,
+            "date_available": "2024-10-10",
+            "price_per_night": 132.58
+        },
+        {
+            "hotel_id": "HOTEL013",
+            "hotel_name": "Hotel Arlington 13",
+            "city": "Arlington",
+            "available_rooms": 27,
+            "date_available": "2024-10-17",
+            "price_per_night": 172.71
+        },
+        {
+            "hotel_id": "HOTEL014",
+            "hotel_name": "Hotel Modesto 14",
+            "city": "Modesto",
+            "available_rooms": 29,
+            "date_available": "2024-09-25",
+            "price_per_night": 245.94
+        },
+        {
+            "hotel_id": "HOTEL015",
+            "hotel_name": "Hotel Fremont 15",
+            "city": "Fremont",
+            "available_rooms": 31,
+            "date_available": "2024-10-22",
+            "price_per_night": 203.81
+        },
+        {
+            "hotel_id": "HOTEL016",
+            "hotel_name": "Hotel Pasadena 16",
+            "city": "Pasadena",
+            "available_rooms": 39,
+            "date_available": "2024-11-04",
+            "price_per_night": 293.7
+        },
+        {
+            "hotel_id": "HOTEL017",
+            "hotel_name": "Hotel Santa Ana 17",
+            "city": "Santa Ana",
+            "available_rooms": 8,
+            "date_available": "2024-10-23",
+            "price_per_night": 289.4
+        },
+        {
+            "hotel_id": "HOTEL018",
+            "hotel_name": "Hotel Los Angeles 18",
+            "city": "Los Angeles",
+            "available_rooms": 40,
+            "date_available": "2024-09-15",
+            "price_per_night": 286.96
+        },
+        {
+            "hotel_id": "HOTEL019",
+            "hotel_name": "Hotel Fontana 19",
+            "city": "Fontana",
+            "available_rooms": 39,
+            "date_available": "2024-11-21",
+            "price_per_night": 184.62
+        },
+        {
+            "hotel_id": "HOTEL020",
+            "hotel_name": "Hotel Brownsville 20",
+            "city": "Brownsville",
+            "available_rooms": 12,
+            "date_available": "2024-09-10",
+            "price_per_night": 207.1
+        }
+    ]
+}
