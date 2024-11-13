@@ -1,23 +1,30 @@
-//importing cities data
-// Load cities data from cities.json dynamically
-let cityData = { cities: [] }; // Default structure in case fetch fails
+// Load the XML data (assuming the XML file is hosted on the server)
+async function loadFlightsXML() {
+  const response = await fetch('flights.xml');
+  const xmlText = await response.text();
+  const parser = new DOMParser();
+  return parser.parseFromString(xmlText, 'application/xml');
+}
 
-fetch("./cities.json")
-  .then((response) => response.json())
-  .then((data) => {
-    cityData = data;
-  })
-  .catch((error) => {
-    console.error("Error loading city data:", error);
-  });
+// Toggle return date field visibility based on trip type
+function toggleReturnDate(show) {
+  const returnDateField = document.getElementById("returnDate");
+  const returnDateContainer = document.getElementById("returnDateContainer");
+
+  if (show) {
+    returnDateContainer.style.display = "block";
+    returnDateField.setAttribute("required", true);
+  } else {
+    returnDateContainer.style.display = "none";
+    returnDateField.removeAttribute("required");
+  }
+}
 
 // Show passenger form when the icon is clicked
-// Show or hide the passenger form when the icon is clicked and set required attribute accordingly
 function showPassengerForm() {
   const passengerForm = document.getElementById("passengerForm");
   const isVisible = passengerForm.style.display === "block";
 
-  // Toggle form visibility
   passengerForm.style.display = isVisible ? "none" : "block";
 
   // Get passenger input fields
@@ -37,24 +44,8 @@ function showPassengerForm() {
   }
 }
 
-// Toggle return date field visibility
-function toggleReturnDate(show) {
-  const returnDateField = document.getElementById("returnDate");
-  const returnDateContainer = document.getElementById("returnDateContainer");
-
-  if (show) {
-    returnDateContainer.style.display = "block";
-    returnDateField.setAttribute("required", true); // Add required when visible
-  } else {
-    returnDateContainer.style.display = "none";
-    returnDateField.removeAttribute("required"); // Remove required when hidden
-  }
-}
-
-// Validate the flight form including passenger and flight details
-// Validate the flight form including passenger and flight details
-function validateFlightForm() {
-  // Get input values
+// Validate and search for flights based on form inputs
+async function validateFlightForm() {
   const origin = document.getElementById("origin").value.trim().toLowerCase();
   const destination = document
     .getElementById("destination")
@@ -62,115 +53,263 @@ function validateFlightForm() {
     .toLowerCase();
   const departureDate = document.getElementById("departureDate").value;
   const returnDateElement = document.getElementById("returnDate");
-  const returnDate = returnDateElement.value ? returnDateElement.value : null;
+  const returnDate = returnDateElement && returnDateElement.value ? returnDateElement.value : null;
+  const tripType = document.querySelector('input[name="tripType"]:checked').value;
+  const adults = parseInt(document.getElementById("adults").value) || 0;
+  const children = parseInt(document.getElementById("children").value) || 0;
+  const infants = parseInt(document.getElementById("infants").value) || 0;
+  const totalPassengers = adults + children + infants;
 
-  const adults = document.getElementById("adults").value;
-  const children = document.getElementById("children").value;
-  const infants = document.getElementById("infants").value;
+  localStorage.setItem('totalPassengers', JSON.stringify(totalPassengers));
+  localStorage.setItem('adults', JSON.stringify(adults))
+  localStorage.setItem('children', JSON.stringify(children))
+  localStorage.setItem('infants', JSON.stringify(infants))
 
-  // Check if the number of adults is at least one
+  // Validate number of passengers
+  if (totalPassengers === 0) {
+    alert("Please enter at least one passenger.");
+    return;
+  }
   if (adults < 1) {
     alert("At least one adult is required for booking.");
     return;
   }
 
-  // Ensure non-negative numbers for all fields
-  if (adults < 0 || children < 0 || infants < 0) {
-    alert("The number of adults, children, and infants must be non-negative.");
-    return;
-  }
-
-  // Regular expression for Texas and California cities
-  const validCities = cityData.cities;
-
-  // Regex for the date validation (YYYY-MM-DD format)
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  const startDate = new Date("2024-09-01");
-  const endDate = new Date("2024-12-01");
-
-  // Regex to validate that passengers are between 0 and 4
-  const passengerRegex = /^[0-4]$/;
-
-  // Validation for origin and destination
+  // Validate origin and destination
+  const validCities = [
+    "dallas", "houston", "austin", "san antonio", "fort worth",
+    "el paso", "arlington", "lubbock", "irving", "garland", "frisco",
+    "brownsville", "laredo", "grand prairie", "los angeles", "san diego",
+    "san jose", "fresno", "anaheim", "bakersfield", "riverside", "stockton",
+    "irvine", "modesto", "chula vista", "long beach", "santa ana", "san bernardino",
+    "oakland", "pasadena", "oxnard", "sacramento"
+  ];
   if (!validCities.includes(origin)) {
     alert("Origin must be a city in Texas or California.");
     return;
   }
-
   if (!validCities.includes(destination)) {
     alert("Destination must be a city in Texas or California.");
     return;
   }
-
-  // Validation for departure date
-  if (!dateRegex.test(departureDate)) {
-    alert("Please enter a valid departure date in the format YYYY-MM-DD.");
+  if (origin === destination) {
+    alert("Origin and destination must be different.");
     return;
   }
+
+  // Validate departure date
+  const startDate = new Date("2024-09-01");
+  const endDate = new Date("2024-12-01");
   const depDateObj = new Date(departureDate);
   if (depDateObj < startDate || depDateObj > endDate) {
     alert("Departure date must be between Sep 1, 2024, and Dec 1, 2024.");
     return;
   }
 
-  // Validation for return date (only if round trip is selected)
-  if (returnDate) {
-    if (!dateRegex.test(returnDate)) {
-      alert("Please enter a valid return date in the format YYYY-MM-DD.");
+  // Validate return date if round trip
+  let returnDateObj;
+  if (tripType === "roundtrip") {
+    if (!returnDate) {
+      alert("Please select a return date for a round trip.");
       return;
     }
-    const returnDateObj = new Date(returnDate);
+    returnDateObj = new Date(returnDate);
     if (returnDateObj <= depDateObj) {
       alert("Return date must be after the departure date.");
       return;
     }
   }
 
-  // Passenger count validation using regex
-  if (!passengerRegex.test(adults)) {
-    alert("Number of adults must be between 0 and 4.");
-    return;
-  }
-  if (!passengerRegex.test(children)) {
-    alert("Number of children must be between 0 and 4.");
-    return;
-  }
-  if (!passengerRegex.test(infants)) {
-    alert("Number of infants must be between 0 and 4.");
-    return;
+  // Load and search flights in XML
+  const xmlDoc = await loadFlightsXML();
+  const flights = xmlDoc.getElementsByTagName('flight');
+
+  // Search for departing flights
+  const departingFlights = searchFlights(flights, origin, destination, departureDate, totalPassengers);
+
+  // Handle round-trip search for return flights if applicable
+  let returningFlights = [];
+  if (tripType === "roundtrip") {
+    returningFlights = searchFlights(flights, destination, origin, returnDate, totalPassengers);
   }
 
-  // Build the alert message for the flight details
-  let flightDetails = `Flight Details:\nOrigin: ${capitalize(
-    origin
-  )}\nDestination: ${capitalize(
-    destination
-  )}\nDeparture Date: ${depDateObj.toDateString()}`;
-
-  // Include the return date if it exists
-  if (returnDate) {
-    flightDetails += `\nReturn Date: ${new Date(returnDate).toDateString()}`;
+  // Display results
+  if (tripType === "oneway") {
+    displayFlights(departingFlights, "Departing Flights");
+  } else {
+    displayRoundTripFlights(departingFlights, returningFlights);
   }
-
-  // Include passengers only if they have been set
-  if (adults) {
-    flightDetails += `\nAdults: ${adults}`;
-  }
-  if (children) {
-    flightDetails += `\nChildren: ${children}`;
-  }
-  if (infants) {
-    flightDetails += `\nInfants: ${infants}`;
-  }
-
-  // Display the flight details
-  alert(flightDetails);
-
-  // Reset the form after displaying details
-  document.getElementById("flightForm").reset();
 }
 
-// Helper function to capitalize the first letter of a string
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+// Function to search for flights based on input criteria
+function searchFlights(flights, origin, destination, date, totalPassengers) {
+  flightsContainer.innerHTML="<h3>Available Flights</h3>";
+  const results = [];
+  const searchDate = new Date(date);
+
+  for (let i = 0; i < flights.length; i++) {
+    const flight = flights[i];
+    const flightOrigin = flight.getElementsByTagName('origin')[0].textContent.toLowerCase();
+    const flightDestination = flight.getElementsByTagName('destination')[0].textContent.toLowerCase();
+    const flightDate = flight.getElementsByTagName('departure-date')[0].textContent;
+    const availableSeats = parseInt(flight.getElementsByTagName('available-seats')[0].textContent);
+
+    const flightDateObj = new Date(flightDate);
+    const diffInDays = Math.abs((flightDateObj - searchDate) / (1000 * 60 * 60 * 24));
+
+    if (
+      flightOrigin === origin &&
+      flightDestination === destination &&
+      diffInDays <= 3 &&
+      availableSeats >= totalPassengers
+    ) {
+      results.push(flight);
+    }
+  }
+  return results;
+}
+
+// Function to display round-trip flight options
+function displayRoundTripFlights(departingFlights, returningFlights) {
+  const flightsContainer = document.getElementById('flightsContainer');
+  flightsContainer.innerHTML = ''; // Clear previous results
+
+  const departingHeader = document.createElement('h4');
+  departingHeader.textContent = "Available Departing Flights";
+  flightsContainer.appendChild(departingHeader);
+  displayFlights(departingFlights, "Departing Flights");
+
+  const returningHeader = document.createElement('h4');
+  returningHeader.textContent = "Available Returning Flights";
+  flightsContainer.appendChild(returningHeader);
+  displayFlights(returningFlights, "Returning Flights");
+
+  // Add the unified "Select Both Flights" button if flights are displayed
+  if (departingFlights.length > 0 && returningFlights.length > 0) {
+    const selectBothButton = document.createElement('button');
+    selectBothButton.id = 'selectBothFlightsButton';
+    selectBothButton.textContent = 'Select Both Flights';
+    selectBothButton.onclick = selectBothFlights;
+    flightsContainer.appendChild(selectBothButton);
+  }
+}
+
+
+// Function to display flights
+function displayFlights(flights, type) {
+  const flightsContainer = document.getElementById('flightsContainer');
+
+  if (flights.length === 0) {
+    const noFlightsMsg = document.createElement('p');
+    noFlightsMsg.textContent = `No available ${type.toLowerCase()} found for your criteria.`;
+    flightsContainer.appendChild(noFlightsMsg);
+    return;
+  }
+
+  flights.forEach(flight => {
+    const flightId = flight.getElementsByTagName('flight-id')[0].textContent;
+    const origin = flight.getElementsByTagName('origin')[0].textContent;
+    const destination = flight.getElementsByTagName('destination')[0].textContent;
+    const departureDate = flight.getElementsByTagName('departure-date')[0].textContent;
+    const arrivalDate = flight.getElementsByTagName('arrival-date')[0].textContent;
+    const departureTime = flight.getElementsByTagName('departure-time')[0].textContent;
+    const arrivalTime = flight.getElementsByTagName('arrival-time')[0].textContent;
+    const availableSeats = flight.getElementsByTagName('available-seats')[0].textContent;
+    const price = flight.getElementsByTagName('price')[0].textContent;
+
+    const flightCard = document.createElement('div');
+    flightCard.className = 'flight-card';
+    flightCard.setAttribute('data-type', type); // Add data-type attribute for distinguishing flights
+    flightCard.innerHTML = `
+      <p><strong>Flight ID:</strong> ${flightId}</p>
+      <p><strong>Origin:</strong> ${origin}</p>
+      <p><strong>Destination:</strong> ${destination}</p>
+      <p><strong>Departure Date:</strong> ${departureDate}</p>
+      <p><strong>Arrival Date:</strong> ${arrivalDate}</p>
+      <p><strong>Departure Time:</strong> ${departureTime}</p>
+      <p><strong>Arrival Time:</strong> ${arrivalTime}</p>
+      <p><strong>Available Seats:</strong> ${availableSeats}</p>
+      <p><strong>Price:</strong> $${price}</p>
+    `;
+
+    // Add a "Select Flight" button for one-way trips
+    if (type === "Departing Flights" || type === "One-Way Trip") {
+      const selectButton = document.createElement('button');
+      selectButton.textContent = "Select Flight";
+      selectButton.onclick = () => selectOneWayFlight(flightId);
+      flightCard.appendChild(selectButton);
+    }
+
+    flightsContainer.appendChild(flightCard);
+  });
+}
+
+
+
+let selectedDepartingFlight = null;
+let selectedReturningFlight = null;
+
+function selectOneWayFlight(flightId) {
+  const flightsContainer = document.getElementById('flightsContainer');
+  const selectedCard = Array.from(flightsContainer.getElementsByClassName('flight-card'))
+    .find(card => card.innerText.includes(`Flight ID: ${flightId}`));
+
+  const selectedFlight = {
+    flightId,
+    origin: selectedCard.querySelector('p:nth-child(2)').textContent.split(': ')[1],
+    destination: selectedCard.querySelector('p:nth-child(3)').textContent.split(': ')[1],
+    departureDate: selectedCard.querySelector('p:nth-child(4)').textContent.split(': ')[1],
+    arrivalDate: selectedCard.querySelector('p:nth-child(5)').textContent.split(': ')[1],
+    departureTime: selectedCard.querySelector('p:nth-child(6)').textContent.split(': ')[1],
+    arrivalTime: selectedCard.querySelector('p:nth-child(7)').textContent.split(': ')[1],
+    price: parseFloat(selectedCard.querySelector('p:nth-child(9)').textContent.split('$')[1]),
+  };
+
+  // Store the selected flight in localStorage
+  localStorage.setItem('selectedDepartingFlight', JSON.stringify(selectedFlight));
+  alert(`Departing flight ${flightId} selected!`);
+  
+  // Redirect to the cart page
+  window.location.href = 'cart.html';
+}
+
+
+function selectBothFlights() {
+  // Retrieve the first displayed departing and returning flights
+  const departingCard = document.querySelector('.flight-card[data-type="Departing Flights"]');
+  const returningCard = document.querySelector('.flight-card[data-type="Returning Flights"]');
+
+  if (!departingCard || !returningCard) {
+    alert('Please select both departing and returning flights.');
+    return;
+  }
+
+  // Extract and store the details of the departing flight
+  const selectedDepartingFlight = {
+    flightId: departingCard.querySelector('p:nth-child(1)').textContent.split(': ')[1],
+    origin: departingCard.querySelector('p:nth-child(2)').textContent.split(': ')[1],
+    destination: departingCard.querySelector('p:nth-child(3)').textContent.split(': ')[1],
+    departureDate: departingCard.querySelector('p:nth-child(4)').textContent.split(': ')[1],
+    arrivalDate: departingCard.querySelector('p:nth-child(5)').textContent.split(': ')[1],
+    departureTime: departingCard.querySelector('p:nth-child(6)').textContent.split(': ')[1],
+    arrivalTime: departingCard.querySelector('p:nth-child(7)').textContent.split(': ')[1],
+    price: parseFloat(departingCard.querySelector('p:nth-child(9)').textContent.split('$')[1]),
+  };
+  localStorage.setItem('selectedDepartingFlight', JSON.stringify(selectedDepartingFlight));
+
+  // Extract and store the details of the returning flight
+  const selectedReturningFlight = {
+    flightId: returningCard.querySelector('p:nth-child(1)').textContent.split(': ')[1],
+    origin: returningCard.querySelector('p:nth-child(2)').textContent.split(': ')[1],
+    destination: returningCard.querySelector('p:nth-child(3)').textContent.split(': ')[1],
+    departureDate: returningCard.querySelector('p:nth-child(4)').textContent.split(': ')[1],
+    arrivalDate: returningCard.querySelector('p:nth-child(5)').textContent.split(': ')[1],
+    departureTime: returningCard.querySelector('p:nth-child(6)').textContent.split(': ')[1],
+    arrivalTime: returningCard.querySelector('p:nth-child(7)').textContent.split(': ')[1],
+    price: parseFloat(returningCard.querySelector('p:nth-child(9)').textContent.split('$')[1]),
+  };
+  localStorage.setItem('selectedReturningFlight', JSON.stringify(selectedReturningFlight));
+
+  alert('Both departing and returning flights have been selected!');
+  window.location.href = 'cart.html';
 }

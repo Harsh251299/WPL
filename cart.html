@@ -49,9 +49,24 @@
       </div>
 
       <div class="main-content">
-            <p id="dateTime"></p>
-            <h2>Cart</h2>
-            <div id="cartDetails"></div>
+        <p id="dateTime"></p>
+        <h2>Cart</h2>
+        <div id="cartDetails"></div>
+        <div>
+          <h2>Selected Flight</h2>
+          <div id="selectedFlightDetails"></div>
+
+          <h3>Passenger Information</h3>
+          <form id="passengerForm" onsubmit="processBooking(); return false;">
+            <div id="passengerInputs"></div>
+            <button type="submit">Book Flight</button>
+          </form>
+
+          <div id="bookingSummary" style="display: none">
+            <h2>Booking Summary</h2>
+            <div id="bookingDetails"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -64,4 +79,3 @@
   </body>
   <script src="cart.js"></script>
 </html>
-

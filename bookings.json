@@ -1,0 +1,26 @@
+[
+    {
+        "bookingNumber": "BOOK1731539219407",
+        "flight-id": "TXCA040",
+        "total-passengers": "2",
+        "total-price": "348.73799999999994",
+        "departure-date": "2024-10-27",
+        "departure-time": "14:30",
+        "origin": "Dallas",
+        "destination": "San Bernardino",
+        "passengers": [
+            {
+                "firstName": "John",
+                "lastName": "Doe",
+                "dob": "2024-11-05",
+                "ssn": "12345678"
+            },
+            {
+                "firstName": "John",
+                "lastName": "Doe",
+                "dob": "2024-11-11",
+                "ssn": "12345678"
+            }
+        ]
+    }
+]
