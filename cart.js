@@ -14,7 +14,7 @@ function loadCart() {
             <p><b>Rooms Required:</b>${cart.rooms_required}</p>
             <p><b> Total Stay: </b>${calculateTotalStay(cart.check_in_date, cart.check_out_date)} days</p>
             <p><b>Total Price:</b> $${calculateTotalPrice(cart.check_in_date, cart.check_out_date, cart.price_per_night, cart.rooms_required)}</p>
-            <button onclick="bookHotel(${JSON.stringify(cart)})">Book Now</button>
+            <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
     } else {
         cartContainer.innerHTML = "<p>Your cart is empty.</p>";
@@ -38,11 +38,8 @@ function calculateTotalPrice(checkIn, checkOut, pricePerNight,roomsRequired) {
 }
 
 // Function to book the hotel and update the available rooms
-function bookHotel(cart) {
-    console.log('inside');
-    const cart = JSON.parse(cart);
-
-    console.log(cart)
+function bookHotel() {
+    const cart = JSON.parse(localStorage.getItem("hotel"));
 
     if (!cart) {
         alert("Your cart is empty.");
