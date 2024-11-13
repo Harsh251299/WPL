@@ -18,6 +18,7 @@
       <a href="cars.html">Cars</a>
       <a href="cruises.html">Cruises</a>
       <a href="contact.html">Contact Us</a>
+      <a href="cart.html">Cart</a>
     </div>
 
     <div class="container">
@@ -28,6 +29,7 @@
         <a href="cars.html">Cars</a>
         <a href="cruises.html">Cruises</a>
         <a href="contact.html">Contact Us</a>
+        <a href="cart.html">Cart</a>
 
         <!-- New section for changing font size -->
         <h3>Settings</h3>
@@ -52,7 +54,9 @@
         <h2>Stays</h2>
         <form id="stayForm" onsubmit="validateStayForm(); return false;">
           <label for="city">City:</label>
-          <input type="text" id="city" required /><br />
+          <select id="city-dropdown">
+            <option value="" disabled selected>Select a city</option>
+          </select><br />
 
           <label for="checkIn">Check-in Date:</label>
           <input type="date" id="checkIn" required /><br />
@@ -71,6 +75,8 @@
 
           <button type="submit">Search</button>
         </form>
+
+        <div id="availableHotels"></div>
       </div>
     </div>
 

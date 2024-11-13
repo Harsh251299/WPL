@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cart</title>
+    <link rel="stylesheet" href="mystyle.css" />
+    <script src="script.js"></script>
+  </head>
+  <body onload="displayDateTime()">
+    <header>Welcome to Travel Deals - Cart</header>
+
+    <div class="navbar">
+      <a href="index.html">Home</a>
+      <a href="stays.html">Stays</a>
+      <a href="flights.html">Flights</a>
+      <a href="cars.html">Cars</a>
+      <a href="cruises.html">Cruises</a>
+      <a href="contact.html">Contact Us</a>
+      <a href="cart.html">Cart</a>
+    </div>
+
+    <div class="container">
+      <div class="sidebar">
+        <h3>Explore</h3>
+        <a href="stays.html">Stays</a>
+        <a href="flights.html">Flights</a>
+        <a href="cars.html">Cars</a>
+        <a href="cruises.html">Cruises</a>
+        <a href="contact.html">Contact Us</a>
+        <a href="cart.html">Cart</a>
+
+        <!-- New section for changing font size -->
+        <h3>Settings</h3>
+        <label for="fontSize">Font Size:</label>
+        <input
+          type="number"
+          id="fontSize"
+          min="12"
+          max="36"
+          value="16"
+          onchange="changeFontSize()"
+          placeholder="Enter font size (px)"
+        />
+
+        <!-- New section for changing background color -->
+        <label for="bgColor">Background Color:</label>
+        <input type="color" id="bgColor" onchange="changeBgColor()" />
+      </div>
+
+      <div class="main-content">
+            <p id="dateTime"></p>
+            <h2>Cart</h2>
+            <div id="cartDetails"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      Section Number: CS 6314.002<br />
+      Dhairya Patel (NetID: ddp230000)<br />
+      Prathamesh Kulkarni (NetID: pdk220001)<br />
+      Harsh Rashmikant Patel (NetID: hxp230001)<br />
+    </div>
+  </body>
+  <script src="cart.js"></script>
+</html>
+

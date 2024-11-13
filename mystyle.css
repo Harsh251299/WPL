@@ -77,7 +77,7 @@ header {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 20px;
   max-width: 855px;
-  font-size: 16px; /* Default font size for the main content */
+  font-size: 16px;
 }
 
 .main-content h2 {
@@ -97,7 +97,7 @@ form {
 form label {
   font-weight: bold;
   margin-top: 15px;
-  font-size: 16px; /* Set default font size for labels */
+  font-size: 16px;
   color: #333;
 }
 
@@ -107,7 +107,7 @@ form input[type="number"],
 form input[type="email"],
 form select {
   padding: 10px;
-  font-size: 16px; /* Set default font size for input fields */
+  font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
   margin-top: 5px;
@@ -117,11 +117,11 @@ form input[type="radio"] {
   margin-right: 10px;
 }
 
-form button {
+.book-button, form button {
   background-color: #4caf50;
   color: white;
   padding: 15px;
-  font-size: 16px; /* Set default font size for buttons */
+  font-size: 16px;
   border: none;
   border-radius: 5px;
   margin-top: 20px;
@@ -129,9 +129,10 @@ form button {
   transition: background-color 0.3s ease;
 }
 
-form button:hover {
+.book-button, form button:hover {
   background-color: #45a049;
 }
+
 
 /* Passenger Icon */
 #passengerIcon {
@@ -158,19 +159,18 @@ form button:hover {
 
 /* Styles for sidebar settings */
 .sidebar label {
-  display: block; /* Make labels stack vertically */
-  margin: 8px 0; /* Add some space between labels and inputs */
+  display: block;
+  margin: 8px 0;
 }
 
 .sidebar input[type="number"],
 .sidebar input[type="color"] {
-  width: calc(100% - 10px); /* Full width minus some padding */
-  padding: 5px; /* Add some padding for better usability */
-  box-sizing: border-box; /* Include padding in total width */
+  width: calc(100% - 10px);
+  padding: 5px;
+  box-sizing: border-box;
 }
 
-/* Adjust font size of form elements to inherit from the main content */
 #stayForm input,
 #stayForm label {
-  font-size: inherit; /* Use the main content's font size */
+  font-size: inherit;
 }
