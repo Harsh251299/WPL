@@ -70,7 +70,7 @@ function validateStayForm() {
 
 // Function to fetch hotels based on the city and date range
 function fetchHotels(city, checkInDate, checkOutDate, roomsRequired) {
-  fetch("hotels.json")
+  fetch("hotels.json?nocache=")
     .then(response => response.json())
     .then(data => {
       const availableHotels = data.hotels.filter(
@@ -108,7 +108,7 @@ function displayHotels(hotels, checkInDate, checkOutDate, roomsRequired) {
         <p>City: ${hotel.city}</p>
         <p>Rooms Available:${hotel.available_rooms}</p>
         <p>Price per Night: $${hotel.price_per_night}</p>
-        <button onclick="addToCart(
+        <button class="book-button" onclick="addToCart(
           '${hotel.hotel_id}', 
           '${hotel.hotel_name}', 
           '${hotel.city}', 

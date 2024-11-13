@@ -117,7 +117,7 @@ form input[type="radio"] {
   margin-right: 10px;
 }
 
-form button {
+.book-button, form button {
   background-color: #4caf50;
   color: white;
   padding: 15px;
@@ -129,25 +129,10 @@ form button {
   transition: background-color 0.3s ease;
 }
 
-form button:hover {
+.book-button, form button:hover {
   background-color: #45a049;
 }
 
-.book-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 15px;
-  font-size: 16px;
-  border: none;
-  border-radius: 5px;
-  margin-top: 20px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.book-button:hover {
-  background-color: #45a049;
-}
 
 /* Passenger Icon */
 #passengerIcon {
