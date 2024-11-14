@@ -44,6 +44,33 @@ function showPassengerForm() {
   }
 }
 
+let cityData = { cities: [] }; // Default structure in case fetch fails
+
+// Fetch cities data
+fetch("./cities.json")
+  .then((response) => response.json())
+  .then((data) => {
+    cityData = data;
+    const originDropdown = document.getElementById("origin");
+    const destinationDropdown = document.getElementById("destination");
+
+    // Populate both origin and destination dropdowns with cities
+    data.cities.forEach((city) => {
+      const originOption = document.createElement("option");
+      originOption.value = city;
+      originOption.textContent = city;
+      originDropdown.appendChild(originOption);
+
+      const destinationOption = document.createElement("option");
+      destinationOption.value = city;
+      destinationOption.textContent = city;
+      destinationDropdown.appendChild(destinationOption);
+    });
+  })
+  .catch((error) => {
+    console.error("Error loading city data:", error);
+  });
+
 // Validate and search for flights based on form inputs
 async function validateFlightForm() {
   const origin = document.getElementById("origin").value.trim().toLowerCase();
@@ -76,19 +103,14 @@ async function validateFlightForm() {
   }
 
   // Validate origin and destination
-  const validCities = [
-    "dallas", "houston", "austin", "san antonio", "fort worth",
-    "el paso", "arlington", "lubbock", "irving", "garland", "frisco",
-    "brownsville", "laredo", "grand prairie", "los angeles", "san diego",
-    "san jose", "fresno", "anaheim", "bakersfield", "riverside", "stockton",
-    "irvine", "modesto", "chula vista", "long beach", "santa ana", "san bernardino",
-    "oakland", "pasadena", "oxnard", "sacramento"
-  ];
-  if (!validCities.includes(origin)) {
+  const originCity = document.getElementById("origin").value;
+  const destinationCity = document.getElementById("destination").value;
+  const validCities = cityData.cities;
+  if (!validCities.includes(originCity)) {
     alert("Origin must be a city in Texas or California.");
     return;
   }
-  if (!validCities.includes(destination)) {
+  if (!validCities.includes(destinationCity)) {
     alert("Destination must be a city in Texas or California.");
     return;
   }
