@@ -189,6 +189,7 @@ function displayRoundTripFlights(departingFlights, returningFlights) {
     const selectBothButton = document.createElement('button');
     selectBothButton.id = 'selectBothFlightsButton';
     selectBothButton.textContent = 'Select Both Flights';
+    selectBothButton.className = 'book-button';
     selectBothButton.onclick = selectBothFlights;
     flightsContainer.appendChild(selectBothButton);
   }
@@ -233,9 +234,11 @@ function displayFlights(flights, type) {
     `;
 
     // Add a "Select Flight" button for one-way trips
-    if (type === "Departing Flights" || type === "One-Way Trip") {
+    const tripType = document.querySelector('input[name="tripType"]:checked')?.value;
+    if (tripType !== "roundtrip") {
       const selectButton = document.createElement('button');
       selectButton.textContent = "Select Flight";
+      selectButton.className = 'book-button';
       selectButton.onclick = () => selectOneWayFlight(flightId);
       flightCard.appendChild(selectButton);
     }

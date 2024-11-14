@@ -77,10 +77,28 @@ function loadFlightsCart() {
     localStorage.getItem("selectedReturningFlight")
   );
 
+  // References for conditional display
+  const flightDetailsContainer = document.getElementById("selectedFlightDetails");
+  const passengerForm = document.getElementById("passengerForm");
+  const passengerInfoHeading = document.getElementById("passengerInfoHeading");
+
+  // Clear flight details initially
+  flightDetailsContainer.innerHTML = "";
+
+  // If no flight is selected, show a message and hide the form and heading
   if (!selectedDepartingFlight && !selectedReturningFlight) {
-    document.getElementById("selectedFlightDetails").innerHTML =
-      "<p>No flight selected.</p>";
+    flightDetailsContainer.innerHTML = "<p>No flight selected.</p>";
+    passengerForm.style.display = "none";
+    if (passengerInfoHeading) {
+      passengerInfoHeading.style.display = "none";
+    }
     return;
+  }
+
+  // Show passenger form and heading if there is at least one selected flight
+  passengerForm.style.display = "block";
+  if (passengerInfoHeading) {
+    passengerInfoHeading.style.display = "block";
   }
 
   let flightDetailsHTML = "";
@@ -221,6 +239,18 @@ function processBooking() {
     passengers.push({ firstName, lastName, dob, ssn });
   }
 
+  // Hide the flight details and passenger form sections
+  const selectedFlightDetails = document.getElementById('selectedFlightDetails');
+  const passengerForm = document.getElementById('passengerForm');
+  selectedFlightDetails.style.display = 'none';
+  const passengerInfoHeading = document.querySelector('h3#passengerInfoHeading');
+
+  selectedFlightDetails.style.display = 'none';
+  passengerForm.style.display = 'none';
+  if (passengerInfoHeading) {
+    passengerInfoHeading.style.display = 'none';
+  }
+
   // Generate unique booking number
   const bookingNumber = `BOOK${Date.now()}`;
 
@@ -305,6 +335,15 @@ function processBooking() {
 
   // Show booking summary
   document.getElementById("bookingSummary").style.display = "block";
+
+  localStorage.removeItem('totalPassengers');
+  localStorage.removeItem('adults');
+  localStorage.removeItem('children');
+  localStorage.removeItem('infants');
+  localStorage.removeItem('selectedDepartingFlight');
+  localStorage.removeItem('selectedReturningFlight');
+  localStorage.removeItem('totalPrice');
+  
 }
 
 function updateAvailableSeats(
