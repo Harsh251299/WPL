@@ -25,7 +25,7 @@ function loadStaysCart() {
             <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
   } else {
-    cartContainer.innerHTML = "<p>Your cart is empty.</p>";
+    cartContainer.innerHTML = "<p>No Hotel Selected.</p>";
   }
 }
 
