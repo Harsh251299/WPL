@@ -22,7 +22,7 @@ function loadStaysCart() {
                 cart.price_per_night,
                 cart.rooms_required
               )
-            ).toFixed(2)}</p>
+            ).toFixed(0)}</p>
             <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
   } else {
