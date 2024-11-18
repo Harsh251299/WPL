@@ -12,16 +12,17 @@ function loadStaysCart() {
             <p><b>Check-out:</b> ${cart.check_out_date}</p>
             <p><b>Price per Night:</b> $${cart.price_per_night}</p>
             <p><b>Rooms Required:</b>${cart.rooms_required}</p>
-            <p><b> Total Stay: </b>${calculateTotalStay(
-              cart.check_in_date,
-              cart.check_out_date
-            )} days</p>
-            <p><b>Total Price:</b> $${calculateTotalPrice(
-              cart.check_in_date,
-              cart.check_out_date,
-              cart.price_per_night,
-              cart.rooms_required
-            )}</p>
+            <p><b> Total Stay: </b>${Number(
+              calculateTotalStay(cart.check_in_date, cart.check_out_date)
+            ).toFixed(2)} days</p>
+            <p><b>Total Price:</b> $${Number(
+              calculateTotalPrice(
+                cart.check_in_date,
+                cart.check_out_date,
+                cart.price_per_night,
+                cart.rooms_required
+              )
+            ).toFixed(2)}</p>
             <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
   } else {
@@ -78,7 +79,9 @@ function loadFlightsCart() {
   );
 
   // References for conditional display
-  const flightDetailsContainer = document.getElementById("selectedFlightDetails");
+  const flightDetailsContainer = document.getElementById(
+    "selectedFlightDetails"
+  );
   const passengerForm = document.getElementById("passengerForm");
   const passengerInfoHeading = document.getElementById("passengerInfoHeading");
 
@@ -240,15 +243,19 @@ function processBooking() {
   }
 
   // Hide the flight details and passenger form sections
-  const selectedFlightDetails = document.getElementById('selectedFlightDetails');
-  const passengerForm = document.getElementById('passengerForm');
-  selectedFlightDetails.style.display = 'none';
-  const passengerInfoHeading = document.querySelector('h3#passengerInfoHeading');
+  const selectedFlightDetails = document.getElementById(
+    "selectedFlightDetails"
+  );
+  const passengerForm = document.getElementById("passengerForm");
+  selectedFlightDetails.style.display = "none";
+  const passengerInfoHeading = document.querySelector(
+    "h3#passengerInfoHeading"
+  );
 
-  selectedFlightDetails.style.display = 'none';
-  passengerForm.style.display = 'none';
+  selectedFlightDetails.style.display = "none";
+  passengerForm.style.display = "none";
   if (passengerInfoHeading) {
-    passengerInfoHeading.style.display = 'none';
+    passengerInfoHeading.style.display = "none";
   }
 
   // Generate unique booking number
@@ -336,14 +343,13 @@ function processBooking() {
   // Show booking summary
   document.getElementById("bookingSummary").style.display = "block";
 
-  localStorage.removeItem('totalPassengers');
-  localStorage.removeItem('adults');
-  localStorage.removeItem('children');
-  localStorage.removeItem('infants');
-  localStorage.removeItem('selectedDepartingFlight');
-  localStorage.removeItem('selectedReturningFlight');
-  localStorage.removeItem('totalPrice');
-  
+  localStorage.removeItem("totalPassengers");
+  localStorage.removeItem("adults");
+  localStorage.removeItem("children");
+  localStorage.removeItem("infants");
+  localStorage.removeItem("selectedDepartingFlight");
+  localStorage.removeItem("selectedReturningFlight");
+  localStorage.removeItem("totalPrice");
 }
 
 function updateAvailableSeats(
