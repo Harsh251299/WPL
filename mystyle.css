@@ -105,6 +105,7 @@ form input[type="text"],
 form input[type="date"],
 form input[type="number"],
 form input[type="email"],
+form input[type="password"],
 form select {
   padding: 10px;
   font-size: 16px;
