@@ -1,4 +1,7 @@
 function validateContactForm() {
+  if (!checkLoginStatus()) {
+    return;
+  }
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
   const phone = document.getElementById("phone").value;
@@ -40,16 +43,19 @@ function validateContactForm() {
     return;
   }
 
+  const commentID = `CMT${Date.now()}`;
+
   // Create XML string
   const xmlString = `
-    <user>
+    <commentData>
+      <commentID>${commentID}</commentID>
       <firstName>${firstName}</firstName>
       <lastName>${lastName}</lastName>
       <phone>${phone}</phone>
       <email>${email}</email>
       <gender>${gender.value}</gender>
       <comment>${comment}</comment>
-    </user>`;
+    </commentsData>`;
 
   // Send XML data to the PHP file
   fetch('save_xml.php', {
@@ -67,4 +73,16 @@ function validateContactForm() {
   .catch(error => {
     console.error('Error saving XML data:', error);
   });
+}
+
+function checkLoginStatus() {
+  const authToken = localStorage.getItem('authToken');
+
+  if (!authToken) {
+    alert('You need to login first!');
+    window.location.href = 'login.html';
+    return false;
+  }
+  return true;
+
 }

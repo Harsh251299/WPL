@@ -6,6 +6,9 @@
     <title>Registration</title>
     <link rel="stylesheet" href="mystyle.css">
     <script src="script.js"></script>
+    <script src="registration.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 </head>
 <body onload="displayDateTime()">
 
@@ -57,6 +60,7 @@
 
         <div class="main-content registration-container">
             <p id="dateTime"></p>
+            <p id="userName"></p>
             <h2>Registration</h2>
             <form id="registrationForm" onsubmit="validateRegistrationForm(); return false;">
                 <label for="phone">Phone Number:</label>

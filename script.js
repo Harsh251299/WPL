@@ -4,6 +4,15 @@ function displayDateTime() {
   document.getElementById("dateTime").textContent = now.toLocaleString();
   setTimeout(displayDateTime, 1000); // Continuously update every second
   changeFontSize(); // Set initial font size when page loads
+  displayUserName();
+}
+
+function displayUserName() {
+  const firstName = localStorage.getItem('firstName');
+  const lastName = localStorage.getItem('lastName');
+  if (firstName && lastName) {
+    document.getElementById('userName').innerHTML = "Current User:- " + firstName + " " + lastName; 
+  }
 }
 
 // Change font size for form elements and main content
