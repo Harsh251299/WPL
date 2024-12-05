@@ -60,7 +60,21 @@
         <p id="dateTime"></p>
         <p id="userName"></p>
         <h2>My Account</h2>
-        <p id="dateTime"></p>
+        <div id="admin">
+          <h3>Upload Hotel Details JSON</h3>
+          <form id="uploadForm" action="upload_json.php" method="POST" enctype="multipart/form-data">
+            <label for="jsonFile">Select JSON File:</label>
+            <input type="file" id="jsonFile" name="jsonFile" accept=".json" required>
+            <button type="submit">Upload</button>
+          </form>
+
+          <h3>Upload Flight Details XML</h3>
+          <form action="process_xml.php" method="POST" enctype="multipart/form-data">
+            <label for="xmlFile">Upload XML:</label>
+            <input type="file" name="xmlFile" id="xmlFile" accept=".xml" required>
+            <button type="submit">Upload</button>
+          </form>
+        </div>
       </div>
     </div>
 
