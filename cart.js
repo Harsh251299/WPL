@@ -25,8 +25,36 @@ function loadStaysCart() {
             ).toFixed(0)}</p>
             <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
+    // Display guest inputs based on number of guests
+    const totalHotelGuests = JSON.parse(localStorage.getItem("totalHotelGuests"))
+    const hotelGuestsInputs = document.getElementById("hotelGuestsInputs");
+    hotelGuestsInputs.innerHTML = "";
+    for (let i = 1; i <= totalHotelGuests; i++) {
+      hotelGuestsInputs.innerHTML += `
+          <h4>Passenger ${i}</h4>
+          <label for="firstName${i}">First Name:</label>
+          <input type="text" id="firstName${i}" required /><br />
+          <label for="lastName${i}">Last Name:</label>
+          <input type="text" id="lastName${i}" required /><br />
+          <label for="dob${i}">Date of Birth:</label>
+          <input type="date" id="dob${i}" required /><br />
+          <label for="ssn${i}">SSN:</label>
+          <input type="text" id="ssn${i}" required /><br />
+          <label>Category:</label>
+          <input type="radio" id="adult${i}" name="category${i}" value="Adult" required />
+          <label for="adult${i}">Adult</label>
+          <input type="radio" id="child${i}" name="category${i}" value="Children" />
+          <label for="children${i}">Children</label>
+          <input type="radio" id="infant${i}" name="category${i}" value="Infant" />
+          <label for="infant${i}">Infant</label><br />
+        `;
+    }
   } else {
     cartContainer.innerHTML = "<p>No Hotel Selected.</p>";
+    guestForm.style.display = "none";
+    if (guestInfoHeading) {
+      guestInfoHeading.style.display = "none";
+    }
   }
 }
 
@@ -217,8 +245,102 @@ function loadFlightsCart() {
         <input type="date" id="dob${i}" required /><br />
         <label for="ssn${i}">SSN:</label>
         <input type="text" id="ssn${i}" required /><br />
+        <label>Category:</label>
+        <input type="radio" id="adult${i}" name="category${i}" value="Adult" required />
+        <label for="adult${i}">Adult</label>
+        <input type="radio" id="child${i}" name="category${i}" value="Children" />
+        <label for="children${i}">Children</label>
+        <input type="radio" id="infant${i}" name="category${i}" value="Infant" />
+        <label for="infant${i}">Infant</label><br />
       `;
   }
+}
+
+function processHotelBooking() {
+  // Get passenger details
+  const totalHotelGuests =
+    parseInt(localStorage.getItem("totalHotelGuests")) || 1;
+  const passengers = [];
+
+  for (let i = 1; i <= totalHotelGuests; i++) {
+    const firstName = document.getElementById(`firstName${i}`).value;
+    const lastName = document.getElementById(`lastName${i}`).value;
+    const dob = document.getElementById(`dob${i}`).value;
+    const ssn = document.getElementById(`ssn${i}`).value;
+    const category = document.querySelector(`input[name="category${i}"]:checked`)?.value;
+
+    // Validate input fields
+    if (!firstName || !lastName || !dob || !ssn || !category) {
+      alert(`Please fill out all details for guests ${i}`);
+      return;
+    }
+
+    passengers.push({ firstName, lastName, dob, ssn, category });
+    localStorage.setItem('guests', JSON.stringify(passengers))
+  }
+
+  // Hide the guest form sections
+
+  const guestForm = document.getElementById("guestForm");
+  selectedFlightDetails.style.display = "none";
+  const guestInfoHeading = document.querySelector(
+    "h3#passengerInfoHeading"
+  );
+
+  selectedFlightDetails.style.display = "none";
+  guestForm.style.display = "none";
+  if (guestInfoHeading) {
+    guestInfoHeading.style.display = "none";
+  }
+
+  // Generate unique booking number
+  const bookingNumber = `BOOK${Date.now()}`;
+
+  // Retrieve selected flights
+  const hotel = JSON.parse(
+    localStorage.getItem("hotel")
+  );
+
+  // Display booking summary
+  const bookingDetails = document.getElementById("bookingDetails");
+  bookingDetails.innerHTML = `
+      <p><strong>Booking Number:</strong> ${bookingNumber}</p>
+    `;
+
+  if (hotel) {
+    bookingDetails.innerHTML += `
+        <p><b>Hotel:</b> ${hotel.name} (ID: ${hotel.hotel_id})</p>
+        <p><b>City:</b> ${hotel.city}</p>
+        <p><b>Check-in:</b> ${hotel.check_in_date}</p>
+        <p><b>Check-out:</b> ${hotel.check_out_date}</p>
+        <p><b>Price per Night:</b> $${hotel.price_per_night}</p>
+        <p><b>Rooms Booked:</b>${hotel.rooms_required}</p>
+        <p><b> Total Stay: </b>${Number(
+          calculateTotalStay(hotel.check_in_date, hotel.check_out_date)
+        ).toFixed(2)} days</p>
+        <p><b>Total Price:</b> $${Number(
+          calculateTotalPrice(
+            hotel.check_in_date,
+            hotel.check_out_date,
+            hotel.price_per_night,
+            hotel.rooms_required
+          )
+        ).toFixed(0)}</p>
+      `;
+  }
+
+  bookingDetails.innerHTML += `<h3>Guests</h3>`;
+
+  passengers.forEach((p, index) => {
+    bookingDetails.innerHTML += `
+        <p>Guest ${index + 1}: ${p.firstName} ${p.lastName}, DOB: ${
+      p.dob
+    }, SSN: ${p.ssn}, Category: ${p.category}</p>
+      `;
+  });
+
+  // Show booking summary
+  document.getElementById("bookingSummary").style.display = "block";
 }
 
 function processBooking() {
@@ -232,14 +354,16 @@ function processBooking() {
     const lastName = document.getElementById(`lastName${i}`).value;
     const dob = document.getElementById(`dob${i}`).value;
     const ssn = document.getElementById(`ssn${i}`).value;
+    const category = document.querySelector(`input[name="category${i}"]:checked`)?.value;
 
     // Validate input fields
-    if (!firstName || !lastName || !dob || !ssn) {
+    if (!firstName || !lastName || !dob || !ssn || !category) {
       alert(`Please fill out all details for Passenger ${i}`);
       return;
     }
 
-    passengers.push({ firstName, lastName, dob, ssn });
+    passengers.push({ firstName, lastName, dob, ssn, category });
+    localStorage.setItem('passengers', JSON.stringify(passengers))
   }
 
   // Hide the flight details and passenger form sections
@@ -336,7 +460,7 @@ function processBooking() {
     bookingDetails.innerHTML += `
         <p>Passenger ${index + 1}: ${p.firstName} ${p.lastName}, DOB: ${
       p.dob
-    }, SSN: ${p.ssn}</p>
+    }, SSN: ${p.ssn}, Category: ${p.category}, Ticket Number:TKT${Date.now()}</p>
       `;
   });
 

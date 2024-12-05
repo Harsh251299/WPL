@@ -57,8 +57,23 @@
       <div class="main-content">
         <p id="dateTime"></p>
         <p id="userName"></p>
-        <h2>Hotel</h2>
-        <div id="cartDetails"></div>
+        <div>
+          <h2>Hotel</h2>
+          <div id="cartDetails"></div>
+
+          <h3 id="guestInfoHeading">Guests Information</h3>
+          <form id="guestForm" onsubmit="processHotelBooking(); return false;">
+            <div id="hotelGuestsInputs"></div>
+            <button type="submit">Book Room</button>
+          </form>
+
+          <div id="bookingSummary" style="display: none">
+            <h2>Booking Summary</h2>
+            <div id="bookingDetails"></div>
+          </div>
+        </div>
+        
+        
         <div>
           <h2>Flight</h2>
           <div id="selectedFlightDetails"></div>

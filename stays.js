@@ -61,6 +61,10 @@ function validateStayForm() {
   // Total guests excluding infants
   const totalGuests = adults + children;
 
+  // Total hotel guests
+  const totalHotelGuests = adults + children + infants;
+  localStorage.setItem('totalHotelGuests', JSON.stringify(totalHotelGuests));
+
   // Calculate the number of rooms required
   let roomsRequired = Math.ceil(totalGuests / 2);
 
