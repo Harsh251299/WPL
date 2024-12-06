@@ -6,6 +6,7 @@
     <title>My Account</title>
     <link rel="stylesheet" href="mystyle.css" />
     <script src="script.js"></script>
+    <script src="myaccount.js"></script>
   </head>
   <body onload="displayDateTime()">
     <!-- Header -->
@@ -62,16 +63,37 @@
         <h2>My Account</h2>
         <div id="admin">
           <h3>Upload Hotel Details JSON</h3>
-          <form id="uploadForm" action="upload_json.php" method="POST" enctype="multipart/form-data">
+          <form
+            id="uploadForm"
+            action="upload_json.php"
+            method="POST"
+            enctype="multipart/form-data"
+          >
             <label for="jsonFile">Select JSON File:</label>
-            <input type="file" id="jsonFile" name="jsonFile" accept=".json" required>
+            <input
+              type="file"
+              id="jsonFile"
+              name="jsonFile"
+              accept=".json"
+              required
+            />
             <button type="submit">Upload</button>
           </form>
 
           <h3>Upload Flight Details XML</h3>
-          <form action="process_xml.php" method="POST" enctype="multipart/form-data">
+          <form
+            action="process_xml.php"
+            method="POST"
+            enctype="multipart/form-data"
+          >
             <label for="xmlFile">Upload XML:</label>
-            <input type="file" name="xmlFile" id="xmlFile" accept=".xml" required>
+            <input
+              type="file"
+              name="xmlFile"
+              id="xmlFile"
+              accept=".xml"
+              required
+            />
             <button type="submit">Upload</button>
           </form>
         </div>

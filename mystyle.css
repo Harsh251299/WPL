@@ -118,7 +118,8 @@ form input[type="radio"] {
   margin-right: 10px;
 }
 
-.book-button, form button {
+.book-button,
+form button {
   background-color: #4caf50;
   color: white;
   padding: 15px;
@@ -130,10 +131,10 @@ form input[type="radio"] {
   transition: background-color 0.3s ease;
 }
 
-.book-button, form button:hover {
+.book-button,
+form button:hover {
   background-color: #45a049;
 }
-
 
 /* Passenger Icon */
 #passengerIcon {
@@ -174,4 +175,62 @@ form input[type="radio"] {
 #stayForm input,
 #stayForm label {
   font-size: inherit;
+}
+.search-section {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+/* Add this to your mystyle.css */
+.search-section button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.search-section button:hover {
+  background-color: #45a049;
+}
+
+.results-section {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.results-table th {
+  background-color: #4caf50;
+  color: white;
+}
+
+.results-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.results-table tr:hover {
+  background-color: #ddd;
 }
