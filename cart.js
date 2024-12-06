@@ -94,9 +94,6 @@ function bookHotel() {
     .then((response) => response.text())
     .then((data) => {
       alert(data);
-      localStorage.removeItem("hotel");
-      localStorage.removeItem("guests");
-      localStorage.removeItem("hotel-booking-id");
       window.location.href = "stays.html"; // Redirect to stays page after booking
     })
     .catch((error) => console.error("Error booking hotel:", error));
@@ -354,6 +351,10 @@ function processHotelBooking() {
   document.getElementById("bookingSummary").style.display = "block";
 
   bookHotel();
+
+  localStorage.removeItem("hotel");
+  localStorage.removeItem("guests");
+  localStorage.removeItem("hotel-booking-id");
 }
 
 function processBooking() {
@@ -380,7 +381,7 @@ function processBooking() {
     }
 
 
-    const ticketID = `TKT${Date.now()}`;
+    const ticketID = `TKT${Date.now()}${Math.floor(Math.random() * 1000)}`;
     passengers.push({ firstName, lastName, dob, ssn, category,ticketID });
     localStorage.setItem('passengers', JSON.stringify(passengers))
   }

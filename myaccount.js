@@ -144,69 +144,7 @@ function setupUserEventListeners() {
   document
     .getElementById("ssnSearchForm")
     .addEventListener("submit", searchFlightsBySSN);
-  // Booking search form
-  // document
-  //   .getElementById("bookingSearchForm")
-  //   .addEventListener("submit", async (e) => {
-  //     e.preventDefault();
-  //     const bookingId = document.getElementById("bookingId").value;
-  //     const bookingType = document.getElementById("bookingType").value;
-
-  //     try {
-  //       const response = await fetch("db_operations.php", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           bookingId: bookingId,
-  //           bookingType: bookingType,
-  //         }),
-  //       });
-  //       const data = await response.json();
-  //       displayResults(data, "search-booking-section");
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       alert("Error searching bookings");
-  //     }
-  //   });
 }
-
-// Event listeners for admin interface
-function setupAdminEventListeners() {
-  // File upload event listeners are already in place in the HTML
-  // Add any additional admin-specific event listeners here
-}
-
-// // Helper function to display results
-// function displayResults(data) {
-//   const resultsDiv = document.getElementById("searchResults");
-//   if (Array.isArray(data) && data.length === 0) {
-//     resultsDiv.innerHTML = "<p>No results found</p>";
-//     return;
-//   }
-
-//   // Convert data to HTML representation
-//   let html = '<table class="results-table"><tr>';
-//   // Add headers based on first result
-//   const headers = Object.keys(data[0]);
-//   headers.forEach((header) => {
-//     html += `<th>${header}</th>`;
-//   });
-//   html += "</tr>";
-
-//   // Add data rows
-//   data.forEach((row) => {
-//     html += "<tr>";
-//     headers.forEach((header) => {
-//       html += `<td>${row[header]}</td>`;
-//     });
-//     html += "</tr>";
-//   });
-//   html += "</table>";
-
-//   resultsDiv.innerHTML = html;
-// }
 
 // API call functions for admin features
 
@@ -214,8 +152,6 @@ async function searchBooking(event) {
   event.preventDefault();
   const bookingId = document.getElementById("bookingId").value;
   const bookingType = document.getElementById("bookingType").value;
-
-  console.log(bookingId, bookingType);
 
   try {
     const response = await fetch("db_operations.php", {
@@ -262,15 +198,6 @@ async function searchPassengers(event) {
 
 async function getSeptember2024Bookings() {
   try {
-    // const response = await fetch("db_operations.php", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-    //   },
-    //   body: JSON.stringify({
-    //     activity: "septemberBookings",
-    //   }),
-    // });
     const response = await fetch("db_operations.php", {
       method: "POST",
       headers: {
