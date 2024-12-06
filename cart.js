@@ -6,7 +6,7 @@ function loadStaysCart() {
 
   if (cart) {
     cartContainer.innerHTML = `
-            <p><b>Hotel:</b> ${cart.name} (ID: ${cart.hotel_id})</p>
+            <p><b>Hotel:</b> ${cart.hotel_name} (ID: ${cart.hotel_id})</p>
             <p><b>City:</b> ${cart.city}</p>
             <p><b>Check-in:</b> ${cart.check_in_date}</p>
             <p><b>Check-out:</b> ${cart.check_out_date}</p>
@@ -23,7 +23,6 @@ function loadStaysCart() {
                 cart.rooms_required
               )
             ).toFixed(0)}</p>
-            <button class="book-button" onclick="bookHotel()">Book Now</button>
         `;
     // Display guest inputs based on number of guests
     const totalHotelGuests = JSON.parse(localStorage.getItem("totalHotelGuests"))
@@ -77,8 +76,12 @@ function calculateTotalPrice(checkIn, checkOut, pricePerNight, roomsRequired) {
 // Function to book the hotel and update the available rooms
 function bookHotel() {
   const cart = JSON.parse(localStorage.getItem("hotel"));
+  const guests = JSON.parse(localStorage.getItem("guests"));
+  const bookingID = JSON.parse(localStorage.getItem("hotel-booking-id"));
 
-  if (!cart) {
+  const info = { hotel:cart, guests, bookingID }
+
+  if (!cart && !guests) {
     alert("Your cart is empty.");
     return;
   }
@@ -86,12 +89,14 @@ function bookHotel() {
   fetch("bookHotel.php", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(cart),
+    body: JSON.stringify(info),
   })
     .then((response) => response.text())
     .then((data) => {
       alert(data);
       localStorage.removeItem("hotel");
+      localStorage.removeItem("guests");
+      localStorage.removeItem("hotel-booking-id");
       window.location.href = "stays.html"; // Redirect to stays page after booking
     })
     .catch((error) => console.error("Error booking hotel:", error));
@@ -257,6 +262,11 @@ function loadFlightsCart() {
 }
 
 function processHotelBooking() {
+  
+  if (!checkLoginStatus()) {
+    return;
+  }
+
   // Get passenger details
   const totalHotelGuests =
     parseInt(localStorage.getItem("totalHotelGuests")) || 1;
@@ -296,7 +306,8 @@ function processHotelBooking() {
   // Generate unique booking number
   const bookingNumber = `BOOK${Date.now()}`;
 
-  // Retrieve selected flights
+  localStorage.setItem('hotel-booking-id', JSON.stringify(bookingNumber));
+
   const hotel = JSON.parse(
     localStorage.getItem("hotel")
   );
@@ -309,7 +320,7 @@ function processHotelBooking() {
 
   if (hotel) {
     bookingDetails.innerHTML += `
-        <p><b>Hotel:</b> ${hotel.name} (ID: ${hotel.hotel_id})</p>
+        <p><b>Hotel:</b> ${hotel.hotel_name} (ID: ${hotel.hotel_id})</p>
         <p><b>City:</b> ${hotel.city}</p>
         <p><b>Check-in:</b> ${hotel.check_in_date}</p>
         <p><b>Check-out:</b> ${hotel.check_out_date}</p>
@@ -341,9 +352,15 @@ function processHotelBooking() {
 
   // Show booking summary
   document.getElementById("bookingSummary").style.display = "block";
+
+  bookHotel();
 }
 
 function processBooking() {
+
+  if (!checkLoginStatus()) {
+    return;
+  }
   // Get passenger details
   const totalPassengers =
     parseInt(localStorage.getItem("totalPassengers")) || 1;
@@ -362,7 +379,9 @@ function processBooking() {
       return;
     }
 
-    passengers.push({ firstName, lastName, dob, ssn, category });
+
+    const ticketID = `TKT${Date.now()}`;
+    passengers.push({ firstName, lastName, dob, ssn, category,ticketID });
     localStorage.setItem('passengers', JSON.stringify(passengers))
   }
 
@@ -460,7 +479,7 @@ function processBooking() {
     bookingDetails.innerHTML += `
         <p>Passenger ${index + 1}: ${p.firstName} ${p.lastName}, DOB: ${
       p.dob
-    }, SSN: ${p.ssn}, Category: ${p.category}, Ticket Number:TKT${Date.now()}</p>
+    }, SSN: ${p.ssn}, Category: ${p.category}, Ticket Number:${p.ticketID}</p>
       `;
   });
 
@@ -476,14 +495,7 @@ function processBooking() {
   localStorage.removeItem("totalPrice");
 }
 
-function updateAvailableSeats(
-  flightId,
-  totalPassengers,
-  totalPrice,
-  passengers,
-  bookingNumber
-) {
-  // Create POST request payload
+function updateAvailableSeats(flightId, totalPassengers, totalPrice, passengers, bookingNumber) {
   const data = new FormData();
   data.append("flightId", flightId);
   data.append("totalPassengers", totalPassengers);
@@ -504,6 +516,19 @@ function updateAvailableSeats(
       console.error("Error:", error);
       alert("An error occurred while updating available seats.");
     });
+}
+
+
+function checkLoginStatus() {
+  const authToken = localStorage.getItem('authToken');
+
+  if (!authToken) {
+    alert('You need to login first!');
+    window.location.href = 'login.html';
+    return false;
+  }
+  return true;
+
 }
 
 loadStaysCart();

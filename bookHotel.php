@@ -1,64 +1,87 @@
 <?php
-// Get JSON input from cart
+require 'db_config.php';
+
+// Parse JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
-$hotel_id = $input['hotel_id'];
-$city = $input['city'];
-$name = $input['name'];
-$check_in_date = $input['check_in_date'];
-$check_out_date = $input['check_out_date'];
-$price_per_night = $input['price_per_night'];
-$rooms_required = $input['rooms_required'];
-
-// Check if HotelBooking.xml exists, if not, create a new XML file
-$xmlFile = 'HotelBooking.xml';
-if (file_exists($xmlFile)) {
-    // Load existing XML file
-    $xml = simplexml_load_file($xmlFile);
-} else {
-    // Create new XML structure if file does not exist
-    $xml = new SimpleXMLElement('<bookings/>');
+// Validate required keys
+if (!isset($input['hotel'], $input['guests'], $input['bookingID'])) {
+    echo "Invalid request: Missing data.";
+    exit;
 }
 
-// Add the booking details
-$booking = $xml->addChild('booking');
-$booking->addChild('hotel_id', $hotel_id);
-$booking->addChild('hotel_name', $name);
-$booking->addChild('city', $city);
-$booking->addChild('check_in_date', $check_in_date);
-$booking->addChild('check_out_date', $check_out_date);
-$booking->addChild('price_per_night', $price_per_night);
-$booking->addChild('rooms_required', $rooms_required);
+// Extract data from input
+$hotelData = $input['hotel'];
+$guests = $input['guests'];
+$bookingID = $input['bookingID'];
 
-// Save or update the XML file with the new booking
-$xml->asXML($xmlFile);
+$hotelID = $hotelData['hotel_id'];
+$hotelName = $hotelData['hotel_name'];
+$city = $hotelData['city'];
+$checkInDate = $hotelData['check_in_date'];
+$checkOutDate = $hotelData['check_out_date'];
+$pricePerNight = $hotelData['price_per_night'];
+$roomsRequired = $hotelData['rooms_required'];
 
-// Update JSON file to reduce available rooms
-$jsonFile = 'hotels.json';
-$json = file_get_contents($jsonFile);
-$data = json_decode($json, true);
+// Begin transaction
+$pdo->beginTransaction();
 
-$bookingSuccess = false;
+try {
+    // Update the hotels table to decrement available rooms
+    $updateHotelQuery = "UPDATE hotels 
+                         SET available_rooms = available_rooms - :rooms 
+                         WHERE hotel_id = :hotel_id AND available_rooms >= :rooms";
+    $updateStmt = $pdo->prepare($updateHotelQuery);
+    $updateStmt->execute([
+        ':rooms' => $roomsRequired,
+        ':hotel_id' => $hotelID
+    ]);
 
-foreach ($data['hotels'] as &$hotel) {
-    if ($hotel['hotel_id'] == $hotel_id) {
-        // Check that available rooms won't go negative
-        if ($hotel['available_rooms'] >= $rooms_required) {
-            $hotel['available_rooms'] -= $rooms_required;
-            $bookingSuccess = true;
-        } else {
-            echo "Booking failed: Not enough rooms available.";
-            exit;
-        }
-        break;
+    if ($updateStmt->rowCount() === 0) {
+        throw new Exception("Booking failed: Not enough rooms available.");
     }
-}
 
-// If booking was successful, save the updated hotel data back to JSON
-if ($bookingSuccess) {
-    file_put_contents($jsonFile, json_encode($data));
-    echo "Booking successful! Your room is reserved.";
-} else {
-    echo "Booking failed: Hotel not found or insufficient rooms.";
+    // Insert into hotel_booking table
+    $totalPrice = $pricePerNight * $roomsRequired;
+    $insertBookingQuery = "INSERT INTO hotel_booking 
+                           (hotel_booking_id, hotel_id, check_in_date, check_out_date, number_of_rooms, price_per_night, total_price) 
+                           VALUES 
+                           (:booking_id, :hotel_id, :check_in_date, :check_out_date, :rooms, :price_per_night, :total_price)";
+    $insertBookingStmt = $pdo->prepare($insertBookingQuery);
+    $insertBookingStmt->execute([
+        ':booking_id' => $bookingID,
+        ':hotel_id' => $hotelID,
+        ':check_in_date' => $checkInDate,
+        ':check_out_date' => $checkOutDate,
+        ':rooms' => $roomsRequired,
+        ':price_per_night' => $pricePerNight,
+        ':total_price' => $totalPrice
+    ]);
+
+    // Insert guests into guests table
+    $insertGuestQuery = "INSERT INTO guests 
+                         (ssn, hotel_booking_id, first_name, last_name, date_of_birth, category) 
+                         VALUES 
+                         (:ssn, :booking_id, :first_name, :last_name, :dob, :category)";
+    $insertGuestStmt = $pdo->prepare($insertGuestQuery);
+
+    foreach ($guests as $guest) {
+        $insertGuestStmt->execute([
+            ':ssn' => $guest['ssn'],
+            ':booking_id' => $bookingID,
+            ':first_name' => $guest['firstName'],
+            ':last_name' => $guest['lastName'],
+            ':dob' => $guest['dob'],
+            ':category' => $guest['category']
+        ]);
+    }
+
+    // Commit the transaction
+    $pdo->commit();
+    echo "Booking successful!";
+} catch (Exception $e) {
+    // Roll back the transaction if anything goes wrong
+    $pdo->rollBack();
+    echo "Booking failed: " . $e->getMessage();
 }
 ?>

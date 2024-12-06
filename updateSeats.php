@@ -1,77 +1,77 @@
 <?php
-// Ensure you send POST data with the flight ID and number of passengers
+require 'db_config.php';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Retrieve data from the POST request
     $flightId = $_POST['flightId'];
     $totalPassengers = $_POST['totalPassengers'];
-    $totalPrice = $_POST['totalPrice']; // Retrieve totalPrice from POST data
-    $passengers = json_decode($_POST['passengers'], true); // Retrieve passengers array from POST data
+    $totalPrice = $_POST['totalPrice'];
+    $passengers = json_decode($_POST['passengers'], true);
     $bookingNumber = $_POST['bookingNumber'];
 
-    // Load the XML file
-    $xml = simplexml_load_file('flights.xml');
-    if ($xml === false) {
-        echo "Failed to load XML file.";
-        exit;
-    }
+    try {
+        // Start transaction
+        $pdo->beginTransaction();
 
-    // Find the flight by ID
-    $flight = null;
-    foreach ($xml->flight as $f) {
-        if ((string)$f->{'flight-id'} === $flightId) {
-            $flight = $f;
-            break;
-        }
-    }
+        // Step 1: Check if the flight has enough available seats
+        $stmt = $pdo->prepare("SELECT available_seats FROM flights WHERE flight_id = :flightId");
+        $stmt->execute([':flightId' => $flightId]);
+        $flight = $stmt->fetch();
 
-    if ($flight !== null) {
-        // Get the current available seats
-        $availableSeats = (int)$flight->{'available-seats'};
-        
-        // Check if enough seats are available
-        if ($availableSeats >= $totalPassengers) {
-            // Update the available seats
-            $flight->{'available-seats'} = $availableSeats - $totalPassengers;
-            
-            // Save the updated XML back to the file
-            $xml->asXML('flights.xml');
-
-            // Store the booking information to a JSON file
-            $bookingInfo = [
-                'bookingNumber' => $bookingNumber,
-                'flight-id' => $flightId,
-                'total-passengers' => $totalPassengers,
-                'total-price' => $totalPrice, // Add totalPrice to booking info
-                'departure-date' => (string)$flight->{'departure-date'},
-                'departure-time' => (string)$flight->{'departure-time'},
-                'origin' => (string)$flight->{'origin'},
-                'destination' => (string)$flight->{'destination'},
-                'passengers' => $passengers // Add passengers array to booking info
-            ];
-
-            // Load existing bookings from the JSON file (if any)
-            $jsonFile = 'bookings.json';
-            if (file_exists($jsonFile)) {
-                $bookings = json_decode(file_get_contents($jsonFile), true);
-                if ($bookings === null) {
-                    $bookings = [];  // Initialize an empty array if decoding fails
-                }
-            } else {
-                $bookings = [];  // Create a new array if the file does not exist
-            }
-
-            // Append the new booking to the array
-            $bookings[] = $bookingInfo;
-
-            // Save the updated bookings back to the JSON file
-            file_put_contents($jsonFile, json_encode($bookings, JSON_PRETTY_PRINT));
-
-            echo "Seats updated successfully and booking saved!";
-        } else {
+        if (!$flight || $flight['available_seats'] < $totalPassengers) {
             echo "Not enough available seats.";
+            $pdo->rollBack();
+            exit;
         }
-    } else {
-        echo "Flight not found.";
+
+        // Step 2: Update available seats in the flights table
+        $newAvailableSeats = $flight['available_seats'] - $totalPassengers;
+        $stmt = $pdo->prepare("UPDATE flights SET available_seats = :availableSeats WHERE flight_id = :flightId");
+        $stmt->execute([
+            ':availableSeats' => $newAvailableSeats,
+            ':flightId' => $flightId
+        ]);
+
+        // Step 3: Insert flight booking into flight-booking table
+        $stmt = $pdo->prepare("INSERT INTO flight_bookings (flight_booking_id, flight_id, total_price) 
+                                VALUES (:bookingId, :flightId, :totalPrice)");
+        $stmt->execute([
+            ':bookingId' => $bookingNumber,
+            ':flightId' => $flightId,
+            ':totalPrice' => $totalPrice
+        ]);
+
+        // Step 4: Insert passengers into passengers table and tickets into tickets table
+        foreach ($passengers as $passenger) {
+            // Insert into passengers table (Ignore duplicates)
+            $stmt = $pdo->prepare("INSERT IGNORE INTO passengers (ssn, first_name, last_name, date_of_birth, category) 
+                                    VALUES (:ssn, :firstName, :lastName, :dob, :category)");
+            $stmt->execute([
+                ':ssn' => $passenger['ssn'],
+                ':firstName' => $passenger['firstName'],
+                ':lastName' => $passenger['lastName'],
+                ':dob' => $passenger['dob'],
+                ':category' => $passenger['category']
+            ]);
+
+            // Insert into tickets table (Ignore duplicates)
+            $stmt = $pdo->prepare("INSERT IGNORE INTO tickets (ticket_id, flight_booking_id, ssn, price) 
+                                    VALUES (:ticketId, :bookingId, :ssn, :price)");
+            $stmt->execute([
+                ':ticketId' => $passenger['ticketID'],
+                ':bookingId' => $bookingNumber,
+                ':ssn' => $passenger['ssn'],
+                ':price' => $totalPrice
+            ]);
+        }
+
+        // Commit the transaction
+        $pdo->commit();
+
+        echo "Seats updated successfully, and booking saved!";
+    } catch (Exception $e) {
+        // Rollback on error
+        $pdo->rollBack();
+        echo "An error occurred: " . $e->getMessage();
     }
 } else {
     echo "Invalid request.";

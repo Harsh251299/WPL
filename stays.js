@@ -1,23 +1,26 @@
 let cityData = { cities: [] }; // Default structure in case fetch fails
 
 // Fetch cities data
-fetch("./cities.json")
+fetch("./fetchCities.php")
   .then((response) => response.json())
   .then((data) => {
-    cityData = data;
     const dropdown = document.getElementById("city-dropdown");
 
-    // Loop through each city and create an option element
-    data.cities.forEach((city) => {
-      const option = document.createElement("option");
-      option.value = city;
-      option.textContent = city;
-      dropdown.appendChild(option);
-    });
+    if (data.cities) {
+      data.cities.forEach((city) => {
+        const option = document.createElement("option");
+        option.value = city;
+        option.textContent = city;
+        dropdown.appendChild(option);
+      });
+    } else {
+      console.error("Error loading city data:", data.error);
+    }
   })
   .catch((error) => {
-    console.error("Error loading city data:", error);
+    console.error("Error fetching cities:", error);
   });
+
 
 // Validate form inputs before submitting
 function validateStayForm() {
@@ -27,13 +30,7 @@ function validateStayForm() {
   const endDate = new Date("2024/12/01");
 
   const city = document.getElementById("city-dropdown").value;
-  const validCities = cityData.cities;
-
-  // City validation
-  if (!validCities.includes(city)) {
-    alert("City must be in Texas or California.");
-    return;
-  }
+ 
 
   // Date validation
   if (checkInDate < startDate || checkOutDate > endDate) {
@@ -74,18 +71,27 @@ function validateStayForm() {
 
 // Function to fetch hotels based on the city and date range
 function fetchHotels(city, checkInDate, checkOutDate, roomsRequired) {
-  fetch("hotels.json?nocache=")
-    .then(response => response.json())
-    .then(data => {
-      const availableHotels = data.hotels.filter(
-        hotel => hotel.city === city
-      );
-      displayHotels(availableHotels, checkInDate, checkOutDate, roomsRequired);
+  const params = new URLSearchParams({
+    city: city,
+    check_in_date: checkInDate,
+    check_out_date: checkOutDate,
+    rooms_required: roomsRequired,
+  });
+
+  fetch(`./fetchHotels.php?${params.toString()}`)
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.hotels) {
+        displayHotels(data.hotels, checkInDate, checkOutDate, roomsRequired);
+      } else {
+        console.error("Error fetching hotels:", data.error);
+      }
     })
-    .catch(error => {
-      console.error("Error fetching hotel data:", error);
+    .catch((error) => {
+      console.error("Error fetching hotels:", error);
     });
 }
+
 
 // Function to display the available hotels in the search results
 function displayHotels(hotels, checkInDate, checkOutDate, roomsRequired) {
@@ -143,7 +149,7 @@ function displayHotels(hotels, checkInDate, checkOutDate, roomsRequired) {
 function addToCart(hotelId, hotelName, city, checkIn, checkOut, pricePerNight,roomsRequired) {
   const cart = {
     hotel_id: hotelId,
-    name: hotelName,
+    hotel_name: hotelName,
     city: city,
     check_in_date: checkIn,
     check_out_date: checkOut,
